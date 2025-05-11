@@ -6,11 +6,18 @@ import {
   deleteCustomer,
   updateCustomer,
 } from './db';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: '*',
+  })
+);
+app.use(express.urlencoded({ extended: true }));
 const db = connectToDB();
 
 app.get('/', (req: Request, res: Response) => {

@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 import './App.css';
 
-const initCustomers = [
-  { id: 1, name: 'John Doe', email: 'john@test.com', age: 30 },
-  { id: 2, name: 'Jane Smith', email: 'jane@test.com', age: 25 },
-  { id: 3, name: 'Bob Johnson', email: 'bob@test.com', age: 40 },
-  { id: 4, name: 'Alice Brown', email: 'alice@test.com', age: 35 },
-  { id: 5, name: 'Charlie Davis', email: 'chr@test.com', age: 28 },
-  { id: 6, name: 'Eve Wilson', email: 'eve@test.com', age: 32 },
-  { id: 7, name: 'David Lee', email: 'david@test.com', age: 29 },
-  { id: 8, name: 'Grace Kim', email: 'grace@test.com', age: 27 },
-];
+// const initCustomers = [
+//   { id: 1, name: 'John Doe', email: 'john@test.com', age: 30 },
+//   { id: 2, name: 'Jane Smith', email: 'jane@test.com', age: 25 },
+//   { id: 3, name: 'Bob Johnson', email: 'bob@test.com', age: 40 },
+//   { id: 4, name: 'Alice Brown', email: 'alice@test.com', age: 35 },
+//   { id: 5, name: 'Charlie Davis', email: 'chr@test.com', age: 28 },
+//   { id: 6, name: 'Eve Wilson', email: 'eve@test.com', age: 32 },
+//   { id: 7, name: 'David Lee', email: 'david@test.com', age: 29 },
+//   { id: 8, name: 'Grace Kim', email: 'grace@test.com', age: 27 },
+// ];
 
 function CustomerList({
   id,
@@ -158,57 +159,101 @@ function AddCustomerWindow({
 
 function App() {
   const [showWAddCustomerWindow, setShowAddCustomerWindow] = useState(false);
-  const [customers, setCustomers] = useState(initCustomers);
-  const deleteCustomer = (id: number) => {
-    setCustomers(customers.filter((customer) => customer.id !== id));
+  // const [customers, setCustomers] = useState(initCustomers);
+  const [customerData, setData] = useState<
+    { id: number; name: string; email: string; age: number }[]
+  >([]);
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3000/api/customers')
+      .then((res) => {
+        console.log('res', res);
+        setData(res.data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  const deleteCustomer = async (id: number) => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:3000/api/customers/${id}`
+      );
+      console.log('res', res);
+      setData(customerData.filter((customer) => customer.id !== id));
+    } catch (err) {
+      console.error('Error deleting customer:', err);
+    }
+    // setCustomers(customers.filter((customer) => customer.id !== id));
   };
 
-  const updateCustomer = (
+  const updateCustomer = async (
     id: number,
     data: { name: string; email: string; age: number }
   ) => {
-    const index = customers.findIndex((customer) => customer.id === id);
-    if (index !== -1) {
-      const updatedCustomers = [...customers];
-      updatedCustomers[index] = {
-        ...updatedCustomers[index],
-        ...data,
-      };
-      setCustomers(updatedCustomers);
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/api/customers/${id}`,
+        data
+      );
+      // console.log('res', res);
+      const index = customerData.findIndex((customer) => customer.id === id);
+      if (index !== -1) {
+        const updatedCustomers = [...customerData];
+        updatedCustomers[index] = {
+          ...updatedCustomers[index],
+          ...data,
+        };
+        setData(updatedCustomers);
+      }
+    } catch (err) {
+      console.error('Error updating customer:', err);
     }
   };
 
-  const addCustomer = (newCustomer: {
+  const addCustomer = async (newCustomer: {
     name: string;
     email: string;
     age: number;
   }) => {
-    setCustomers([
-      ...customers,
-      {
-        id: customers.length + 1,
-        ...newCustomer,
-      },
-    ]);
+    try {
+      const res = await axios.post(
+        'http://localhost:3000/api/customers',
+        newCustomer
+      );
+      console.log('res', res);
+      setData([
+        ...customerData,
+        { id: customerData.length + 1, ...newCustomer },
+      ]);
+    } catch (err) {
+      console.error('Error adding customer:', err);
+    }
   };
 
   return (
     <div className="App">
       <h1>Customer List</h1>
       <div className="customer-list">
-        {customers.map((customer) => {
-          return (
-            <CustomerList
-              key={customer.id}
-              id={customer.id}
-              name={customer.name}
-              email={customer.email}
-              age={customer.age}
-              onDelete={deleteCustomer}
-              onUpdate={updateCustomer}
-            />
-          );
-        })}
+        {customerData.length > 0 ? (
+          customerData.map((customer, index) => {
+            return (
+              <CustomerList
+                key={`${customer.id}-${index}`}
+                id={customer.id}
+                name={customer.name}
+                email={customer.email}
+                age={customer.age}
+                onDelete={deleteCustomer}
+                onUpdate={updateCustomer}
+              />
+            );
+          })
+        ) : (
+          <div className="no-data">
+            <h2>Loading customers</h2>
+          </div>
+        )}
       </div>
       <button
         className="add-customer-btn"
