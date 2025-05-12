@@ -2,16 +2,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import './App.css';
 
-// const initCustomers = [
-//   { id: 1, name: 'John Doe', email: 'john@test.com', age: 30 },
-//   { id: 2, name: 'Jane Smith', email: 'jane@test.com', age: 25 },
-//   { id: 3, name: 'Bob Johnson', email: 'bob@test.com', age: 40 },
-//   { id: 4, name: 'Alice Brown', email: 'alice@test.com', age: 35 },
-//   { id: 5, name: 'Charlie Davis', email: 'chr@test.com', age: 28 },
-//   { id: 6, name: 'Eve Wilson', email: 'eve@test.com', age: 32 },
-//   { id: 7, name: 'David Lee', email: 'david@test.com', age: 29 },
-//   { id: 8, name: 'Grace Kim', email: 'grace@test.com', age: 27 },
-// ];
+const DOMAIN = import.meta.env.VITE_BACKEND_DOMAIN;
 
 function CustomerList({
   id,
@@ -159,14 +150,13 @@ function AddCustomerWindow({
 
 function App() {
   const [showWAddCustomerWindow, setShowAddCustomerWindow] = useState(false);
-  // const [customers, setCustomers] = useState(initCustomers);
   const [customerData, setData] = useState<
     { id: number; name: string; email: string; age: number }[]
   >([]);
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/api/customers')
+      .get(`${DOMAIN}/api/customers`)
       .then((res) => {
         console.log('res', res);
         setData(res.data);
@@ -176,15 +166,12 @@ function App() {
 
   const deleteCustomer = async (id: number) => {
     try {
-      const res = await axios.delete(
-        `http://localhost:3000/api/customers/${id}`
-      );
-      console.log('res', res);
+      await axios.delete(`${DOMAIN}/api/customers/${id}`);
+      // console.log('res', res);
       setData(customerData.filter((customer) => customer.id !== id));
     } catch (err) {
       console.error('Error deleting customer:', err);
     }
-    // setCustomers(customers.filter((customer) => customer.id !== id));
   };
 
   const updateCustomer = async (
@@ -192,10 +179,7 @@ function App() {
     data: { name: string; email: string; age: number }
   ) => {
     try {
-      const res = await axios.put(
-        `http://localhost:3000/api/customers/${id}`,
-        data
-      );
+      await axios.put(`${DOMAIN}/api/customers/${id}`, data);
       // console.log('res', res);
       const index = customerData.findIndex((customer) => customer.id === id);
       if (index !== -1) {
@@ -217,11 +201,8 @@ function App() {
     age: number;
   }) => {
     try {
-      const res = await axios.post(
-        'http://localhost:3000/api/customers',
-        newCustomer
-      );
-      console.log('res', res);
+      await axios.post(`${DOMAIN}/api/customers`, newCustomer);
+      // console.log('res', res);
       setData([
         ...customerData,
         { id: customerData.length + 1, ...newCustomer },
