@@ -62,10 +62,8 @@ app.post('/api/customers', async (req: Request, res: Response) => {
       res.status(400).json({ error: 'Name, email, and age are required' });
       return;
     }
-    const rs = await insertCustomer(db, req.body);
-    console.log('rs', rs);
-    console.log('rs.insertId', rs.insertId);
-    const customerId = rs.insertId;
+    const { id: customerId } = await insertCustomer(db, req.body);
+    // console.log('rs', customerId);
     const customer = await getCustomerById(db, customerId);
     res.status(201).json({
       message: 'Customer added successfully',

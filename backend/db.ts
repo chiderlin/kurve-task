@@ -1,19 +1,19 @@
-import mysql, { ResultSetHeader } from 'mysql2/promise';
+// import mysql, { ResultSetHeader } from 'mysql2/promise';
+import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
-let pool: mysql.Pool;
+let pool: Pool;
 
 export function connectToDB() {
   if (!pool) {
-    pool = mysql.createPool({
+    pool = new Pool({
       host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '5432'),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
+      ssl: { rejectUnauthorized: false },
     });
     console.log('Connected to the database');
   }
@@ -22,28 +22,28 @@ export function connectToDB() {
 }
 
 export async function insertCustomer(
-  pool: mysql.Pool,
+  pool: Pool,
   customer: { name: string; email: string; age: number }
-): Promise<ResultSetHeader> {
+): Promise<any> {
   try {
-    const query = `INSERT INTO ${process.env.DB_NAME}.Customers (name, email, age) VALUES (?,?,?)`;
-    const [result] = await pool.execute<ResultSetHeader>(query, [
+    const query = `INSERT INTO customers (name, email, age) VALUES ($1,$2,$3) RETURNING id`;
+    const result = await pool.query(query, [
       customer.name,
       customer.email,
       customer.age,
     ]);
     console.log('Inserted customer:', result);
-    return result;
+    return result.rows[0];
   } catch (error) {
     console.error('Error inserting customer:', error);
     throw error;
   }
 }
 
-export async function getCustomers(pool: mysql.Pool) {
+export async function getCustomers(pool: Pool) {
   try {
-    const query = `SELECT * FROM ${process.env.DB_NAME}.Customers`;
-    const [rows] = await pool.execute(query);
+    const query = `SELECT * FROM customers`;
+    const { rows } = await pool.query(query);
     return rows;
   } catch (error) {
     console.error('Error fetching customers:', error);
@@ -51,10 +51,10 @@ export async function getCustomers(pool: mysql.Pool) {
   }
 }
 
-export async function getCustomerById(pool: mysql.Pool, id: number) {
+export async function getCustomerById(pool: Pool, id: number) {
   try {
-    const query = `SELECT * FROM ${process.env.DB_NAME}.Customers WHERE id = ?`;
-    const [rows] = await pool.execute<any[]>(query, [id]);
+    const query = `SELECT * FROM customers WHERE id = $1`;
+    const { rows } = await pool.query(query, [id]);
     return rows[0];
   } catch (error) {
     console.error('Error fetching customer by ID:', error);
@@ -63,13 +63,13 @@ export async function getCustomerById(pool: mysql.Pool, id: number) {
 }
 
 export async function updateCustomer(
-  pool: mysql.Pool,
+  pool: Pool,
   id: number,
   customer: { name: string; email: string; age: number }
 ) {
   try {
-    const query = `UPDATE ${process.env.DB_NAME}.Customers SET name = ?, email = ?, age = ? WHERE id = ?`;
-    const [result] = await pool.execute(query, [
+    const query = `UPDATE customers SET name = $1, email = $2, age = $3 WHERE id = $4`;
+    const result = await pool.query(query, [
       customer.name,
       customer.email,
       customer.age,
@@ -83,10 +83,10 @@ export async function updateCustomer(
   }
 }
 
-export async function deleteCustomer(pool: mysql.Pool, id: number) {
+export async function deleteCustomer(pool: Pool, id: number) {
   try {
-    const query = `DELETE FROM ${process.env.DB_NAME}.Customers WHERE id = ?`;
-    const [result] = await pool.execute(query, [id]);
+    const query = `DELETE FROM customers WHERE id = $1`;
+    const result = await pool.query(query, [id]);
     console.log('Deleted customer:', result);
     return result;
   } catch (error) {

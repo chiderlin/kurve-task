@@ -116,5 +116,4 @@ function App() {
 export default App;
 
 // TODO:deploy to Render
-// TODO: README.md
 // TODO: generate fake data (10,000) -> lazy loading
