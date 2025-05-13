@@ -1,0 +1,24 @@
+# This workflow will build the frontend and deploy it to GitHub Pages
+name: Deploy frontend to GitHub Pages # github action name
+
+# The workflow is triggered on push to the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # The workflow will run on the latest version of Ubuntu
+    steps:
+      - uses: actions/checkout@v3 # This action checks out your repository under $GITHUB_WORKSPACE(runner), so your workflow can access it.
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '21' # The workflow will use Node.js version 21
+      - run: npm install
+      - run: npm run build
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN}}
+          publish_dir: ./dist
