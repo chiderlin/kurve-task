@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import mysql, { ResultSetHeader } from 'mysql2/promise';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -24,10 +24,10 @@ export function connectToDB() {
 export async function insertCustomer(
   pool: mysql.Pool,
   customer: { name: string; email: string; age: number }
-) {
+): Promise<ResultSetHeader> {
   try {
     const query = `INSERT INTO ${process.env.DB_NAME}.Customers (name, email, age) VALUES (?,?,?)`;
-    const [result] = await pool.execute(query, [
+    const [result] = await pool.execute<ResultSetHeader>(query, [
       customer.name,
       customer.email,
       customer.age,
@@ -50,6 +50,18 @@ export async function getCustomers(pool: mysql.Pool) {
     throw error;
   }
 }
+
+export async function getCustomerById(pool: mysql.Pool, id: number) {
+  try {
+    const query = `SELECT * FROM ${process.env.DB_NAME}.Customers WHERE id = ?`;
+    const [rows] = await pool.execute<any[]>(query, [id]);
+    return rows[0];
+  } catch (error) {
+    console.error('Error fetching customer by ID:', error);
+    throw error;
+  }
+}
+
 export async function updateCustomer(
   pool: mysql.Pool,
   id: number,

@@ -5,6 +5,7 @@ import {
   getCustomers,
   deleteCustomer,
   updateCustomer,
+  getCustomerById,
 } from './db';
 import cors from 'cors';
 
@@ -36,6 +37,24 @@ app.get('/api/customers', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/api/customers/:id', async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const _id = parseInt(id);
+  if (isNaN(_id)) {
+    res.status(400).json({ error: 'Invalid ID' });
+    return;
+  }
+  try {
+    const customer = await getCustomerById(db, _id);
+    res.status(200).json(customer);
+    return;
+  } catch (error) {
+    console.error('Error fetching customer:', error);
+    res.status(500).json({ error: 'Internal server error' });
+    return;
+  }
+});
+
 app.post('/api/customers', async (req: Request, res: Response) => {
   const { name, email, age } = req.body;
   try {
@@ -45,8 +64,12 @@ app.post('/api/customers', async (req: Request, res: Response) => {
     }
     const rs = await insertCustomer(db, req.body);
     console.log('rs', rs);
+    console.log('rs.insertId', rs.insertId);
+    const customerId = rs.insertId;
+    const customer = await getCustomerById(db, customerId);
     res.status(201).json({
       message: 'Customer added successfully',
+      data: customer,
     });
     return;
   } catch (error) {
