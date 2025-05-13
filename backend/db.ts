@@ -21,6 +21,32 @@ export function connectToDB() {
   return pool;
 }
 
+export async function insertBulkCustomers(
+  pool: Pool,
+  customers: { name: string; email: string; age: number }[]
+): Promise<any> {
+  try {
+    const query = `INSERT INTO customers (name, email, age) 
+    VALUES ${customers
+      .map(
+        (_, index) =>
+          `($${index * 3 + 1}, $${index * 3 + 2}, $${index * 3 + 3})`
+      )
+      .join(', ')}
+    `;
+    const values = customers.flatMap((customer) => [
+      customer.name,
+      customer.email,
+      customer.age,
+    ]);
+    await pool.query(query, values);
+    console.log(`Inserted ${customers.length} customers successfully.`);
+  } catch (error) {
+    console.error('Error inserting customer:', error);
+    throw error;
+  }
+}
+
 export async function insertCustomer(
   pool: Pool,
   customer: { name: string; email: string; age: number }
@@ -40,10 +66,10 @@ export async function insertCustomer(
   }
 }
 
-export async function getCustomers(pool: Pool) {
+export async function getCustomers(pool: Pool, limit: number, offset: number) {
   try {
-    const query = `SELECT * FROM customers`;
-    const { rows } = await pool.query(query);
+    const query = `SELECT * FROM customers ORDER BY id LIMIT $1 OFFSET $2`;
+    const { rows } = await pool.query(query, [limit, offset]);
     return rows;
   } catch (error) {
     console.error('Error fetching customers:', error);

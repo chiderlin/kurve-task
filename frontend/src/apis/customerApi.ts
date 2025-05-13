@@ -1,10 +1,15 @@
 import axios from 'axios';
 const DOMAIN = import.meta.env.VITE_BACKEND_DOMAIN;
 
-export const getCustomers = async () => {
+export const getCustomers = async (limit: number, offset: number) => {
   try {
-    const res = await axios.get(`${DOMAIN}/api/customers`);
+    // console.log('limit', limit);
+    // console.log('offset', offset);
+    const res = await axios.get(
+      `${DOMAIN}/api/customers?limit=${limit}&offset=${offset}`
+    );
     // console.log('res', res);
+
     return res.data;
   } catch (err) {
     console.error('Error fetching customers:', err);

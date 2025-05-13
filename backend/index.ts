@@ -6,6 +6,7 @@ import {
   deleteCustomer,
   updateCustomer,
   getCustomerById,
+  insertBulkCustomers,
 } from './db';
 import cors from 'cors';
 
@@ -27,7 +28,14 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/api/customers', async (req: Request, res: Response) => {
   try {
-    const customers = await getCustomers(db);
+    const { limit, offset } = req.query;
+    console.log('limit', limit);
+    console.log('offset', offset);
+    const customers = await getCustomers(
+      db,
+      parseInt(limit as string),
+      parseInt(offset as string)
+    );
     res.status(200).json(customers);
     return;
   } catch (error) {
@@ -124,6 +132,27 @@ app.delete('/api/customers/:id', async (req: Request, res: Response) => {
     return;
   }
 });
+
+// for testing bulk insert
+// app.post('/api/customers/bulk', async (req: Request, res: Response) => {
+//   try {
+//     const customers = Array.from({ length: 1000 }, (_, i) => ({
+//       name: `Customer ${i}`,
+//       email: `customer${i + 1}@example.com`,
+//       age: Math.floor(Math.random() * 60) + 20,
+//     }));
+
+//     await insertBulkCustomers(db, customers);
+//     res.status(201).json({
+//       message: 'Customers added successfully',
+//     });
+//     return;
+//   } catch (error) {
+//     console.error('Error inserting customers:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//     return;
+//   }
+// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
