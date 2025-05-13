@@ -34,3 +34,4 @@ jobs:
           force_orphan: true # This option will create a new orphan branch for the deployment
           commit_message: 'Deploy frontend to GitHub Pages' # The commit message for the deployment
           user_name: 'github-actions[bot]' # The name of the user who will be used to commit the changes
+          user_email: 'github-actions[bot]@users.noreply.github.com' # The email of the user who will be used to commit the changes
