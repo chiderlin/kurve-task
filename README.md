@@ -137,7 +137,7 @@ The database uses **Render PostgreSQL** (Free Tier).
 ### Prerequisites
 
 - Node.js (v21)
-- MySQL database
+- PostgreSQL database
 - npm
 
 ### Setup
