@@ -44,7 +44,7 @@ export const addCustomer = async (newCustomer: {
 }) => {
   try {
     const res = await axios.post(`${DOMAIN}/api/customers`, newCustomer);
-    console.log('res', res);
+    // console.log('res', res);
     return res.data;
   } catch (err) {
     console.error('Error adding customer:', err);

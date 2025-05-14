@@ -9,7 +9,7 @@ import {
 import CustomerList from './components/CustomerList';
 import AddCustomerWindow from './components/AddCustomerWindow';
 
-//FIXME: init loading twice
+//NOTE: local development init load twice
 function App() {
   const [loading, setLoading] = useState(false); // loading state
   const [hasMore, setHasMore] = useState(true); // has more data
@@ -28,12 +28,12 @@ function App() {
       const limit = 10;
       const offset = customerData.length;
       const customers = await getCustomers(limit, offset);
-      console.log(
-        'Fetched:',
-        customers.map((c: { id: number }) => c.id)
-      );
-      console.log('Offset used:', offset);
-      console.log('customers', customers);
+      // console.log(
+      //   'Fetched:',
+      //   customers.map((c: { id: number }) => c.id)
+      // );
+      // console.log('Offset used:', offset);
+      // console.log('customers', customers);
       if (customers.length < limit) {
         setHasMore(false);
       }
