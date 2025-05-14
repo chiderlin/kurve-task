@@ -62,6 +62,57 @@ backend/
 
 ---
 
+## Deployment
+
+### Frontend
+
+The frontend is deployed to **GitHub Pages** using **GitHub Actions**. The deployment is triggered automatically whenever changes are pushed to the `main` branch.
+
+#### Steps:
+
+1. Ensure the `frontend/vite.config.ts` file has the correct `base` path for GitHub Pages:
+   ```ts
+   export default defineConfig({
+     plugins: [react()],
+     base: '/kurve-task/', // Replace with your repository name
+   });
+   ```
+2. The GitHub Actions workflow is defined in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). It builds the frontend and deploys it to the `gh-pages` branch.
+
+---
+
+### Backend
+
+The backend is deployed to **Render** as a web service.
+
+#### Steps:
+
+1. Connect the repository to Render.
+2. Create a new **Web Service** in Render.
+3. Use the following settings:
+   - **Build Command**: `npm install && npm run build`
+   - **Start Command**: `npm start`
+4. Add the environment variables from `backend/.env` to the Render service.
+
+---
+
+### Database
+
+The database uses **Render PostgreSQL** (Free Tier).
+
+#### Steps:
+
+1. Create a new **PostgreSQL Database** in Render.
+2. Copy the database credentials and update the `backend/.env` file with the following:
+   ```properties
+   DB_HOST=<your-database-host>
+   DB_PORT=5432
+   DB_USER=<your-database-user>
+   DB_PASSWORD=<your-database-password>
+   DB_NAME=<your-database-name>
+   ```
+3. Add these environment variables to the Render backend service.
+
 ## How It Works
 
 1. **Frontend**:
@@ -104,11 +155,12 @@ backend/
    ```
 
 3. Create a `.env` file for environment variables:
-   ```
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=yourpassword
-   DB_NAME=yourdatabase
+   ```properties
+   DB_HOST=<your-database-host>
+   DB_PORT=5432
+   DB_USER=<your-database-user>
+   DB_PASSWORD=<your-database-password>
+   DB_NAME=<your-database-name>
    ```
 4. Start the backend server:
    ```
