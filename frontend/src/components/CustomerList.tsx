@@ -67,11 +67,11 @@ export default function CustomerList({
             />
           </>
         ) : (
-          <>
+          <div className="customer-item">
             <h3>{editedName}</h3>
             <p>{editedEmail}</p>
             <p>{editedAge}</p>
-          </>
+          </div>
         )}
       </div>
     </div>
