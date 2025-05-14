@@ -30,8 +30,3 @@ jobs:
           personal_token: ${{ secrets.GH_PAGES_TOKEN}} # This token is used to authenticate with GitHub (generated in the repository settings)
           publish_dir: ./frontend/dist
           publish_branch: gh-pages # The branch to which the build will be deployed
-          destination_dir: . # The directory to which the build will be deployed
-          force_orphan: true # This option will create a new orphan branch for the deployment
-          commit_message: 'Deploy frontend to GitHub Pages' # The commit message for the deployment
-          user_name: 'github-actions[bot]' # The name of the user who will be used to commit the changes
-          user_email: 'github-actions[bot]@users.noreply.github.com' # The email of the user who will be used to commit the changes
