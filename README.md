@@ -1,3 +1,6 @@
+> Render PostgreSQL Database Service free trial has expired.
+> Project is no longer maintained.
+
 # React + TypeScript + Vite Project
 
 This project is a full-stack application built with **React**, **TypeScript**, and **Vite** on the frontend, and **Node.js** with **Express** on the backend. The application demonstrates a customer management system with features to add, update, delete, and fetch customer data.

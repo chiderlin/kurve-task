@@ -44,7 +44,8 @@
 .customer-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: center;
+  /* justify-content: left;  */
   gap: 1.5rem;
 }
 
